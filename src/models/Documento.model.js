@@ -128,6 +128,7 @@ Documento.listarDocumentos = async function() {
     const query =
         `SELECT 
             d.* ,
+            c.categoria,
             g.gestion,
             TO_CHAR(d.fecha_entrega, 'DD/MM/YYYY') as fecha_entrega,
             pp.nombre_programa,
@@ -160,7 +161,7 @@ Documento.listarDocumentos = async function() {
         LEFT JOIN principal.${dbPrefix('persona')} t ON td.id_persona = a.id_persona
         LEFT JOIN public.${dbPrefix('vista_programas')} pp ON d.id_planificacion_programa = pp.id_planificacion_programa
         LEFT JOIN principal.${dbPrefix('persona')} coor ON d.id_coordinador = coor.id_persona
-        GROUP BY d.id_documento, pp.nombre_programa, coor.id_persona,g.id_gestion
+        GROUP BY d.id_documento, pp.nombre_programa, coor.id_persona,g.id_gestion, c.id_categoria
         `;
 
     const [totalRecords] = await sequelize.query(`SELECT COUNT(*) as count FROM ${mainSchema()}.${dbPrefix('srp_documento')}`, {
