@@ -174,7 +174,7 @@ Documento.listarDocumentos = async function() {
 
     const documentos = await sequelize.query(query, {
         type: sequelize.QueryTypes.SELECT,
-        logging: console.log
+        // logging: console.log
     });
 
     return {

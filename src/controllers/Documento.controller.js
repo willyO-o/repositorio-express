@@ -1,7 +1,7 @@
 // const jwt = require('jsonwebtoken');
 const asyncHandler = require('../utils/asyncHandler');
-// const Sequelize = require('sequelize');
 const Documento = require('../models/Documento.model');
+
 
 
 
@@ -22,7 +22,15 @@ const listarDocumentos = asyncHandler(async(req, res) => {
     // });
 });
 
+const registrarDocumento = asyncHandler(async(req, res) => {
+    const documento = req.body;
+    const archivo = req.files;
+    console.log(archivo);
+    // const result = await Documento.registrarDocumento(documento);
+    return res.json(documento, archivo);
+});
 
 module.exports = {
-    listarDocumentos
+    listarDocumentos,
+    registrarDocumento,
 }
