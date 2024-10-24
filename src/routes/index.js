@@ -7,9 +7,10 @@ const upload = multer({ storage: storage });
 const { listarDocumentos, registrarDocumento } = require('../controllers/Documento.controller');
 const { listarPersonas } = require('../controllers/Persona.controller');
 const { listarPlanificacionPrograma } = require('../controllers/PlanificacionPrograma.controller');
+const { registrarDocumentoRules } = require('../middlewares/validation/Documento.validation');
 
 router.get('/documento', listarDocumentos);
-router.post('/documento', upload.fields([{ name: 'archivo', maxCount: 1 }, { name: 'archivos_adicionales', maxCount: 1 }]), registrarDocumento);
+router.post('/documento', upload.fields([{ name: 'archivo', maxCount: 1 }, { name: 'archivos_adicionales', maxCount: 1 }]), registrarDocumentoRules, registrarDocumento);
 router.get('/persona', listarPersonas);
 router.get('/planificacion-programa', listarPlanificacionPrograma);
 

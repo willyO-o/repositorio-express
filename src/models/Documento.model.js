@@ -24,7 +24,8 @@ const Documento = sequelize.define('Documento', {
     },
     lenguaje: {
         type: DataTypes.STRING(15),
-        allowNull: true
+        allowNull: true,
+        defaultValue: "ESPAÑOL"
     },
     titulo: {
         type: DataTypes.STRING(2000),
@@ -52,7 +53,8 @@ const Documento = sequelize.define('Documento', {
     },
     estado_documento: {
         type: DataTypes.STRING(25),
-        allowNull: true
+        allowNull: true,
+        defaultValue: "REGISTRADO"
     },
     tamanio_archivo: {
         type: DataTypes.STRING(10),
@@ -64,7 +66,8 @@ const Documento = sequelize.define('Documento', {
     },
     uuid: {
         type: DataTypes.STRING(50),
-        allowNull: true
+        allowNull: false,
+        unique: true,
     },
     codigo_documento: {
         type: DataTypes.STRING(25),
@@ -72,15 +75,16 @@ const Documento = sequelize.define('Documento', {
     },
     es_publico: {
         type: DataTypes.BOOLEAN,
-        allowNull: true
+        allowNull: false,
+        defaultValue: false
     },
     nro_id: {
         type: DataTypes.INTEGER,
-        allowNull: true
+        allowNull: false,
     },
     id_usuario_registro: {
         type: DataTypes.INTEGER,
-        allowNull: true
+        allowNull: true,
     },
     derechos: {
         type: DataTypes.STRING(-1),
@@ -92,7 +96,8 @@ const Documento = sequelize.define('Documento', {
     },
     fecha_registro: {
         type: DataTypes.DATE,
-        allowNull: true
+        allowNull: false,
+        defaultValue: sequelize.literal('CURRENT_TIMESTAMP')
     },
     fecha_entrega: {
         type: DataTypes.DATE,
@@ -104,7 +109,8 @@ const Documento = sequelize.define('Documento', {
     },
     url_portada: {
         type: DataTypes.STRING(500),
-        allowNull: true
+        allowNull: false,
+        defaultValue: 'default.jpg'
     },
     otro_titulo: {
         type: DataTypes.STRING(-1),
@@ -152,19 +158,19 @@ Documento.listarDocumentos = async function() {
                 )
             ) as tutor
 
-        FROM ${mainSchema()}.${dbPrefix('srp_documento')} d
-        JOIN academico.${dbPrefix('gestion')} g ON d.id_gestion = g.id_gestion
-        LEFT JOIN ${mainSchema()}.${dbPrefix('srp_categoria')} c ON d.id_categoria = c.id_categoria
-        LEFT JOIN ${mainSchema()}.${dbPrefix('srp_autor_documento')} ad ON d.id_documento = ad.id_documento
-        LEFT JOIN principal.${dbPrefix('persona')} a ON ad.id_persona = a.id_persona
-        LEFT JOIN ${mainSchema()}.${dbPrefix('srp_tutor_documento')} td ON d.id_documento = td.id_documento
-        LEFT JOIN principal.${dbPrefix('persona')} t ON td.id_persona = a.id_persona
-        LEFT JOIN public.${dbPrefix('vista_programas')} pp ON d.id_planificacion_programa = pp.id_planificacion_programa
-        LEFT JOIN principal.${dbPrefix('persona')} coor ON d.id_coordinador = coor.id_persona
+        FROM ${dbPrefix('srp_documento')} d
+        JOIN ${dbPrefix('gestion')} g ON d.id_gestion = g.id_gestion
+        LEFT JOIN ${dbPrefix('srp_categoria')} c ON d.id_categoria = c.id_categoria
+        LEFT JOIN ${dbPrefix('srp_autor_documento')} ad ON d.id_documento = ad.id_documento
+        LEFT JOIN ${dbPrefix('persona')} a ON ad.id_persona = a.id_persona
+        LEFT JOIN ${dbPrefix('srp_tutor_documento')} td ON d.id_documento = td.id_documento
+        LEFT JOIN ${dbPrefix('persona')} t ON td.id_persona = a.id_persona
+        LEFT JOIN ${dbPrefix('vista_programas')} pp ON d.id_planificacion_programa = pp.id_planificacion_programa
+        LEFT JOIN ${dbPrefix('persona')} coor ON d.id_coordinador = coor.id_persona
         GROUP BY d.id_documento, pp.nombre_programa, coor.id_persona,g.id_gestion, c.id_categoria
         `;
-
-    const [totalRecords] = await sequelize.query(`SELECT COUNT(*) as count FROM ${mainSchema()}.${dbPrefix('srp_documento')}`, {
+    await sequelize.query("SET search_path TO repositorio, academico, public ,principal");
+    const [totalRecords] = await sequelize.query(`SELECT COUNT(*) as count FROM ${dbPrefix('srp_documento')}`, {
         type: sequelize.QueryTypes.SELECT,
     });
 
@@ -184,5 +190,7 @@ Documento.listarDocumentos = async function() {
     };
 
 }
+
+
 
 module.exports = Documento;
